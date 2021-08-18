@@ -10,13 +10,14 @@ import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 
 import java.io.*;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Demo3 {
     public static void main(String[] args) throws Exception{
-        String filePath = "/Users/hehebangjia/Desktop/files/11";
-        String outPath = "/Users/hehebangjia/Desktop/接单项目组/论坛项目/voicetest/voiceTest/target/classes/template.xls";
+        String filePath = "/Users/hehebangjia/Desktop/testFile";
+        String outPath = "/Users/hehebangjia/Downloads/nearSatisfied/study/NiXiang/docWordToExcel/target/template.xls";
         File file = new File(filePath);
         File[] files = file.listFiles();
         Workbook workbook = new HSSFWorkbook(new FileInputStream(new File(outPath)));
@@ -39,6 +40,7 @@ public class Demo3 {
     }
 
     private static boolean setRegx(boolean flag,Row row,String text){
+        //Logger logger = new Logger("textLogger");
         //原告赢
         Pattern compile5 = Pattern.compile("被告[\\u4E00-\\u9FA5、]{0,}担[\\u4E00-\\u9FA5]{0,}案[\\u4E00-\\u9FA5]{0,}诉讼费");
         Matcher matcher5 = compile5.matcher(text);
@@ -173,7 +175,7 @@ public class Demo3 {
                         cell.setCellValue(resAgency);
                     }
                     //第二种情况，只有一个负担的就是败诉方
-                    if(fuDanStr.length==2&&row.getCell(6)!=null&&flag){
+                    if(fuDanStr.length<=2&&row.getCell(6)!=null&&flag){
                         String resStr2 = "";
                         if(text.contains("负担")) {
                             resStr2 = text.substring(text.indexOf("，由") + 2, text.indexOf("负担"));
@@ -219,6 +221,17 @@ public class Demo3 {
                     Cell cell = row.getCell(2);
                     cell.setCellValue(sbYuan.toString());
                 }
+                //处理不含冒号的原告被告，如果第二段文本不含冒号就是属于原告直接+名称的形式
+                /*String paragraphText1 = paras.get(1).getParagraphText();
+                if(paragraphText1.startsWith("原告")&&!paragraphText1.contains(":")&&!paragraphText1.contains("：")){
+
+                    String yuanGao = "";
+                    if(text.contains(","))
+                    yuanGao = text.substring(2,text.indexOf(","));
+                    else
+                        yuanGao = text.substring(2);
+                    sbYuan.append(yuanGao).append("\n");
+                }*/
                 if(text.startsWith("原告：")){
                     j=1;
                     String yuanGao = "";
